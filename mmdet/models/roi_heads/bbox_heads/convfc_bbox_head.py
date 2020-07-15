@@ -132,7 +132,7 @@ class ConvFCBBoxHead(BBoxHead):
                     nn.init.xavier_uniform_(m.weight)
                     nn.init.constant_(m.bias, 0)
 
-    def forward(self, x):
+    def forward(self, x, get_feature=False):
         # shared part
         if self.num_shared_convs > 0:
             for conv in self.shared_convs:
@@ -147,6 +147,8 @@ class ConvFCBBoxHead(BBoxHead):
             for fc in self.shared_fcs:
                 x = self.relu(fc(x))
         # separate branches
+        if get_feature:
+            feature = x
         x_cls = x
         x_reg = x
 
@@ -170,7 +172,10 @@ class ConvFCBBoxHead(BBoxHead):
 
         cls_score = self.fc_cls(x_cls) if self.with_cls else None
         bbox_pred = self.fc_reg(x_reg) if self.with_reg else None
-        return cls_score, bbox_pred
+        if get_feature:
+            return cls_score, bbox_pred, feature
+        else:
+            return cls_score, bbox_pred
 
 
 @HEADS.register_module()
@@ -203,3 +208,45 @@ class Shared4Conv1FCBBoxHead(ConvFCBBoxHead):
             fc_out_channels=fc_out_channels,
             *args,
             **kwargs)
+
+
+@HEADS.register_module()
+class BBoxMaskFeatureAdaptation(nn.Module):
+
+    def __init__(self,
+                 in_channels=1024,
+                 out_conv_channels=256,
+                 roi_feat_size=7,
+                 scale_factor=2,
+                 upmethod='upsample'):
+        super(BBoxMaskFeatureAdaptation, self).__init__()
+        assert isinstance(roi_feat_size, int)
+
+        self.in_channels = in_channels
+        self.out_conv_channels = out_conv_channels
+        self.roi_feat_size = roi_feat_size
+        self.out_channels = (roi_feat_size**2) * out_conv_channels
+        self.scale_factor = scale_factor
+        self.upmethod = upmethod
+
+        self.bridge = nn.Linear(self.in_channels, self.out_channels)
+        self.upsample = nn.Upsample(
+            scale_factor=scale_factor, mode='bilinear', align_corners=True)
+        self.convt = nn.Sequential(
+            nn.ConvTranspose2d(in_channels=self.out_conv_channels,
+                               out_channels=self.out_conv_channels,
+                               kernel_size=2, stride=2),
+            nn.BatchNorm2d(num_features=self.out_conv_channels)
+            )
+
+    def forward(self, x):
+        N, in_C = x.shape
+        out_C = self.out_conv_channels
+        out_HW = self.roi_feat_size
+        x = self.bridge(x)
+        x = x.reshape(N, out_C, out_HW, out_HW)
+        if self.upmethod == 'upsample':
+            x = self.upsample(x)
+        else:
+            x = self.convt(x)
+        return x

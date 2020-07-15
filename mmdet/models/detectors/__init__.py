@@ -8,6 +8,7 @@ from .fovea import FOVEA
 from .fsaf import FSAF
 from .grid_rcnn import GridRCNN
 from .htc import HybridTaskCascade
+from .ms_fa_htc import MSFAHybridTaskCascade
 from .mask_rcnn import MaskRCNN
 from .mask_scoring_rcnn import MaskScoringRCNN
 from .nasfcos import NASFCOS
@@ -22,5 +23,5 @@ __all__ = [
     'ATSS', 'BaseDetector', 'SingleStageDetector', 'TwoStageDetector', 'RPN',
     'FastRCNN', 'FasterRCNN', 'MaskRCNN', 'CascadeRCNN', 'HybridTaskCascade',
     'RetinaNet', 'FCOS', 'GridRCNN', 'MaskScoringRCNN', 'RepPointsDetector',
-    'FOVEA', 'FSAF', 'NASFCOS', 'PointRend'
+    'FOVEA', 'FSAF', 'NASFCOS', 'PointRend', 'MSFAHybridTaskCascade'
 ]
