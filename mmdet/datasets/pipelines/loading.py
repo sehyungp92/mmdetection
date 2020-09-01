@@ -322,7 +322,7 @@ class LoadAnnotations(object):
                             results['ann_info']['seg_map'])
         img_bytes = self.file_client.get(filename)
         results['gt_semantic_seg'] = mmcv.imfrombytes(
-            img_bytes, flag='unchanged').squeeze()
+            img_bytes, flag='unchanged').squeeze()[:,:,0]
         results['seg_fields'].append('gt_semantic_seg')
         return results
 
