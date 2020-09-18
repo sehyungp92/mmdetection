@@ -1,4 +1,4 @@
-# Instance Segmentation of NovelObjects in a Conveyor Setting
+# Instance Segmentation of Novel Objects in a Conveyor Setting
 
 ## Installation
 
