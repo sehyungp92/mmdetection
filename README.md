@@ -10,7 +10,6 @@ cd mmdetection
 python setup.py develop
 pip install "git+https://github.com/open-mmlab/cocoapi.git#subdirectory=pycocotools"
 pip install git+https://github.com/lucasb-eyer/pydensecrf.git
-pip install --upgrade albumentations
 ```
 If using Colab, also:
 ```
