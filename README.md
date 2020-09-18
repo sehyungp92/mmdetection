@@ -62,6 +62,9 @@ We have created ipynbs with more detailed instructions.
 Please use:
 
 ```supervised_baseline.ipynb``` on how to train the baseline model
+
 ```pseudo_labels.ipynb``` on how to generated pseudo labels with the trained teacher models
+
 ```annotation_creator.ipynb``` on how to create custom annotations in COCO format
+
 ```semi_supervised.ipynb``` on how to train and test the student model
